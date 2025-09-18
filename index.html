@@ -159,7 +159,25 @@
     apprenticeshipCost: 14_000, // Federal registered apprenticeship cost per participant (DOL 2024)
     electricSchoolBusCost: 400_000, // Average price of an electric school bus (EPA Clean School Bus Program)
     fiberMileCost: 35_000, // Cost per mile to deploy rural fiber broadband (NTIA 2024)
-    firefighterGearSetCost: 18_000 // Complete turnout gear and equipment per firefighter (NFPA 2024)
+    firefighterGearSetCost: 18_000, // Complete turnout gear and equipment per firefighter (NFPA 2024)
+    communityCollegeTuitionAnnual: 3_990, // Average in-district community college tuition & fees (College Board 2023)
+    affordableHousingUnitCost: 220_000, // Typical cost to build a new affordable apartment (Urban Institute 2024)
+    heatPumpInstallCost: 15_000, // Installed cost for a cold-climate heat pump system (DOE 2024)
+    leadServiceLineReplacementCost: 12_000, // Average cost to replace a lead service line (EPA 2023)
+    wildfireAcreTreatmentCost: 1_400, // Cost per acre for forest fuel reduction (USFS 2023)
+    mentalHealthSessionCost: 150, // Average out-of-pocket cost per therapy session (APA 2024)
+    mealsOnWheelsCostPerMeal: 7, // Meals on Wheels average cost per delivered meal (2024 network data)
+    foodBankMealCost: 3.6, // Average sourcing cost per food bank meal (Feeding America 2024)
+    insulinMonthlyCost: 450, // Average monthly insulin list price before caps (KFF 2023)
+    libraryRenovationCost: 10_000_000, // Major public library gut renovation (IMLS case studies)
+    stemScholarshipCost: 40_000, // Four-year STEM scholarship at public universities (NSF estimates)
+    homeResilienceUpgradeCost: 9_000, // Cost to harden a home against hurricanes (IBHS FORTIFIED 2024)
+    dvShelterNightCost: 150, // Average cost to provide a night of safe shelter (NNEDV 2023)
+    jobTrainingProgramCost: 7_500, // Cost per participant for intensive workforce training (DOL 2024)
+    prenatalVisitCost: 160, // Average prenatal care visit cost (ACOG 2024)
+    vaccineDoseCost: 20, // Federal contract price for routine childhood vaccines (CDC 2024)
+    ruralWaterSystemCost: 2_500_000, // Typical cost to build a rural community water system (USDA RD 2024)
+    resilientMicrogridCost: 5_000_000 // Median cost for a critical-facility microgrid (DOE 2024)
   };
 
   // Human-friendly number formatters used throughout the UI.
@@ -226,6 +244,24 @@
     const electricBuses = total / release.electricSchoolBusCost;
     const fiberMiles = total / release.fiberMileCost;
     const firefighterGearSets = total / release.firefighterGearSetCost;
+    const communityCollegeYears = total / release.communityCollegeTuitionAnnual;
+    const affordableUnits = total / release.affordableHousingUnitCost;
+    const heatPumps = total / release.heatPumpInstallCost;
+    const leadPipes = total / release.leadServiceLineReplacementCost;
+    const wildfireAcres = total / release.wildfireAcreTreatmentCost;
+    const mentalHealthSessions = total / release.mentalHealthSessionCost;
+    const mealsDelivered = total / release.mealsOnWheelsCostPerMeal;
+    const foodBankMeals = total / release.foodBankMealCost;
+    const insulinMonths = total / release.insulinMonthlyCost;
+    const libraryRenovations = total / release.libraryRenovationCost;
+    const stemScholarships = total / release.stemScholarshipCost;
+    const resilientHomes = total / release.homeResilienceUpgradeCost;
+    const dvShelterNights = total / release.dvShelterNightCost;
+    const jobTrainingSlots = total / release.jobTrainingProgramCost;
+    const prenatalVisits = total / release.prenatalVisitCost;
+    const vaccineDoses = total / release.vaccineDoseCost;
+    const cleanWaterSystems = total / release.ruralWaterSystemCost;
+    const microgrids = total / release.resilientMicrogridCost;
 
     // String fragments are pre-built here so the rotator can swap them in cheaply.
     return [
@@ -257,6 +293,21 @@
       `Buying <strong>${nf0.format(electricBuses)}</strong> electric school buses.`,
       `Running fiber broadband across <strong>${nf1.format(fiberMiles)}</strong> miles of rural roads.`,
       `Outfitting <strong>${nf0.format(firefighterGearSets)}</strong> firefighters with new gear.`,
+      `Covering a year of community college tuition for <strong>${nf0.format(communityCollegeYears)}</strong> students.`,
+      `Building <strong>${nf0.format(affordableUnits)}</strong> new affordable apartments.`,
+      `Installing <strong>${nf0.format(heatPumps)}</strong> high-efficiency heat pumps in homes.`,
+      `Replacing <strong>${nf0.format(leadPipes)}</strong> lead drinking water lines.`,
+      `Treating <strong>${nf0.format(wildfireAcres)}</strong> acres of forest to prevent megafires.`,
+      `Providing <strong>${nf0.format(mentalHealthSessions)}</strong> mental health counseling sessions.`,
+      `Delivering <strong>${nf0.format(mealsDelivered)}</strong> Meals on Wheels visits to homebound seniors.`,
+      `Supplying <strong>${nf0.format(foodBankMeals)}</strong> food bank meals nationwide.`,
+      `Covering insulin for <strong>${nf0.format(insulinMonths)}</strong> person-months of diabetes care.`,
+      `Endowing <strong>${nf0.format(stemScholarships)}</strong> four-year STEM scholarships.`,
+      `Hardening <strong>${nf0.format(resilientHomes)}</strong> coastal homes against hurricane winds.`,
+      `Providing <strong>${nf0.format(dvShelterNights)}</strong> nights of safe shelter for survivors of domestic violence.`,
+      `Covering prenatal care visits for <strong>${nf0.format(prenatalVisits)}</strong> expectant parents.`,
+      `Buying <strong>${nf0.format(vaccineDoses)}</strong> routine childhood vaccine doses.`,
+      `Building <strong>${nf0.format(cleanWaterSystems)}</strong> rural community water systems.`,
     ];
   }
 
@@ -308,7 +359,7 @@
     isTransitioning = true;
     els.scaleSentence.classList.add('fading');
     setTimeout(() => {
-      sentenceIndex = (sentenceIndex + 1) % sentences.length;
+      sentenceIndex = (sentenceIndex + Math.round(Math.random() * 10)) % sentences.length;
       els.scaleSentence.innerHTML = sentences[sentenceIndex];
       els.scaleSentence.classList.remove('fading');
       isTransitioning = false;

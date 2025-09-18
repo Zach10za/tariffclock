@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Tariff Cost Clock</title>
+<style>
+  :root{
+    --bg:#0b1020; --card:#111936; --fg:#e9eefc; --muted:#9fb0da;
+    --accent:#36e08f; --accent2:#ff6b6b; --shadow:0 10px 35px rgba(0,0,0,.35)
+  }
+  html,body{height:100%}
+  body{
+    margin:0; background:linear-gradient(180deg,#0a0f1e,#101936);
+    color:var(--fg); font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    display:flex; align-items:center; justify-content:center; padding:32px
+  }
+  .wrap{
+    max-width:960px; width:100%; min-height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:28px; text-align:center
+  }
+  h1{margin:0;font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:.4px}
+  .tagline{margin:0; max-width:640px; color:var(--muted); font-size:1rem}
+  .total{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size:8vw; font-weight:800; letter-spacing:clamp(0.12rem,1vw,0.35rem); color:var(--accent);
+    text-shadow:0 0 22px rgba(54,224,143,.35); padding:0 clamp(1.5rem,4vw,4rem);
+    box-sizing:border-box; width:100%; max-width:100%; display:flex;
+    justify-content:center; align-items:center; text-align:center; margin:0 auto;
+  }
+  .scaleLead{margin:0; color:var(--muted); font-size:1rem; letter-spacing:.03em}
+  .loading{
+    display:flex; gap:8px; align-items:center; justify-content:center;
+    color:#7f90c4; font-size:.95rem; margin-top:12px;
+  }
+  .loading .dot{
+    width:8px; height:8px; border-radius:50%; background:#7f90c4;
+    animation:pulse 0.8s ease-in-out infinite alternate;
+  }
+  .loading .dot:nth-child(1){animation-delay:0s}
+  .loading .dot:nth-child(2){animation-delay:.15s}
+  .loading .dot:nth-child(3){animation-delay:.3s}
+  .loading .text{letter-spacing:.04em}
+  .loading.hidden{display:none}
+  @keyframes pulse{from{opacity:.3; transform:scale(.8)}to{opacity:1; transform:scale(1.2)}}
+  .percapita{
+    display:flex; gap:24px; justify-content:center; align-items:center; margin:4px 0 12px;
+    color:#aebce9; font-size:clamp(.85rem,2.3vw,1.05rem);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .percapita span{display:flex; flex-direction:column; gap:4px; align-items:center}
+  .percapita small{color:#6f7dab; text-transform:uppercase; letter-spacing:.12em; font-size:.68rem}
+  .percapita strong{
+    color:var(--fg);
+  }
+  .narrative{display:flex; flex-direction:column; align-items:center; width:100%; margin:0; padding:0 16px; min-height:100px}
+  .narrative p{
+    margin:0; color:#d5e0ff; font-size:clamp(20px,3vw,32px); line-height:1.4;
+    white-space:normal; text-wrap:balance; opacity:1; transition:opacity .4s ease-in-out
+  }
+  .narrative p.fading{opacity:0}
+  .narrative strong{
+    color:var(--accent);
+    font-weight:700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  .foot{color:#b9c6ec; font-size:.85rem; max-width:680px; line-height:1.4}
+  .sources{color:#7487c0; font-size:.8rem}
+  @media (max-width:600px){
+    body{padding:18px}
+    .wrap{gap:18px}
+    .percapita{flex-direction:column; gap:6px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>The Cost of Tariffs</h1>
+  <p class="tagline">The total cost of tariff taxes on American businesses and consumers since April 2025.</p>
+
+  <div class="total" id="total" aria-live="polite">$000,000,000,000</div>
+  <div class="loading" id="loading">
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="dot"></span>
+    <span class="text" id="loadingText">Fetching latest Treasury data…</span>
+  </div>
+  <div class="percapita" aria-live="polite">
+    <span>
+      <small>Per U.S. Household</small>
+      <strong id="perHousehold">—</strong>
+    </span>
+    <span>
+      <small>Per U.S. Adult</small>
+      <strong id="perAdult">—</strong>
+    </span>
+  </div>
+
+  <p class="scaleLead">So far that's roughly equivalent to:</p>
+  <div class="narrative" aria-live="polite">
+    <p id="scaleSentence">-</p>
+  </div>
+
+  <div class="foot">
+    <div class="sources" id="releaseLabel"></div>
+    <p>Notes: This is a simplified, gross measure of tariff collections. Not every dollar of duties = consumer price increases; some costs are absorbed by firms. Duties are an import tax ultimately borne by U.S. businesses and households over time. Data refresh is monthly; the live clock is an extrapolation. Tariff totals pull directly from the U.S. Treasury FiscalData API (Monthly Treasury Statement Table 4) whenever new records are published.</p>
+    <p class="sources">Sources: U.S. Treasury FiscalData API — Monthly Treasury Statement Table 4 • BLS Import/Export Price Program • BLS CPI detailed tables • BLS OEWS</p>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  // ---------- Static configuration & live Treasury data fetch ----------
+  const release = {
+    startISO: '2025-04-01T00:00:00Z',
+    iphone17Price: 799, // Retail for iPhone 17
+    studentDebtBalance: 37_000, // Average federal student loan balance per borrower (2023, Dept. of Education)
+    teacherPay: 69_480, // Median public school teacher pay (BLS OEWS May 2023)
+    childcareCost: 12_000, // Approx. annual infant childcare cost per Child Care Aware national average
+    erVisitCost: 2_600, // Mean emergency room visit charge (HCUP 2022)
+    solarInstallCost: 25_000, // Average 7kW residential solar installation before incentives (SEIA 2024)
+    familyPremium: 23_968, // Average employer family health insurance premium (KFF 2023)
+    pellGrantMax: 7_395, // 2024-25 maximum Pell Grant award
+    usGraduatesPerYear: 3_700_000, // U.S. high school graduates annually (NCES)
+    usBirthsPerYear: 3_700_000, // Annual U.S. births (CDC 2023)
+    dailyERVisits: 400_000, // Approximate national ER visits per day (HCUP 2022)
+    solarCityHouseholds: 90_000, // Households in Reno, NV (ACS rounded)
+    tampaHouseholds: 165_000, // Households in Tampa, FL metro core (ACS rounded)
+    largeUniversityEnrollment: 30_000, // Enrollment at a large state university campus
+    usHouseholds: 128_000_000, // Total U.S. households (ACS 2023)
+    usAdultPopulation: 258_000_000, // Adults 18+ (Census 2023)
+    avgElectricBillMonthly: 137, // Average monthly residential electric bill (EIA 2023)
+    familyFoodAnnual: 11_000, // Average annual food-at-home spend for a family of four (USDA 2024)
+    usRenterHouseholds: 44_000_000, // Renter-occupied households (Census CPS 2023)
+    avgRentMonthly: 1_450, // Median asking rent (Census 2024 Q1)
+    publicTuitionAnnual: 11_260, // Average in-state public 4-yr tuition & fees (College Board 2023)
+    interstateMileCost: 20_000_000, // Typical cost to rebuild a mile of interstate (FHWA range)
+    femaHouseholdGrant: 35_500, // Average Individual Assistance grant after major disasters (FEMA 2023)
+    usK12Students: 50_000_000, // K-12 enrollment (NCES 2023)
+    schoolLunchPerYear: 720, // School meals per student per year (~$4 per meal, 180 days)
+    avgMortgagePayment: 2_100, // Average monthly mortgage payment (MBA National Delinquency Survey 2024)
+    usMortgageHouseholds: 50_000_000, // Owner-occupied households with mortgages (Census CPS 2023)
+    avgAutoPayment: 738, // Average new car monthly payment (Experian State of the Automotive Finance Market 2024)
+    autoLoanHouseholds: 45_000_000, // Households with auto loans or leases (Fed Survey of Consumer Finances)
+    avgGasFill: 55, // Typical cost to fill a 14-gallon tank at $3.90/gal (AAA May 2024)
+    avgWaterBillMonthly: 75, // Median monthly residential water bill (Circle of Blue 2024)
+    avgBroadbandBillMonthly: 75, // Average monthly broadband bill (Leichtman Research Group 2024)
+    nurseSalary: 89_010, // Median registered nurse pay (BLS OEWS May 2023)
+    largeDistrictTeachers: 2_000, // Teachers employed in a large urban district (NCES common size)
+    bridgeRehabCost: 3_500_000, // Typical cost to rehabilitate a highway bridge (FHWA 2023)
+    waterMainMileCost: 1_100_000, // Average cost to replace a mile of water main (AWWA 2024)
+    portCraneCost: 12_000_000, // Ship-to-shore crane cost (American Association of Port Authorities)
+    smallFactoryCost: 80_000_000, // Capital cost for a modern small manufacturing plant (NIST MEP 2024)
+    childTaxCredit: 2_000, // Full Child Tax Credit per child (IRS 2024)
+    schoolLaptopCost: 600, // All-in cost for a durable classroom laptop (NCES tech budgets)
+    fireTruckCost: 750_000, // Average cost of a municipal fire engine (NFPA 2024)
+    publicSafetyStationCost: 18_000_000, // Turn-key cost for a combined fire/police station (ICMA capital survey)
+    apprenticeshipCost: 14_000, // Federal registered apprenticeship cost per participant (DOL 2024)
+    electricSchoolBusCost: 400_000, // Average price of an electric school bus (EPA Clean School Bus Program)
+    fiberMileCost: 35_000, // Cost per mile to deploy rural fiber broadband (NTIA 2024)
+    firefighterGearSetCost: 18_000 // Complete turnout gear and equipment per firefighter (NFPA 2024)
+  };
+
+  const nf0 = new Intl.NumberFormat('en-US',{minimumFractionDigits:0, maximumFractionDigits:0});
+  const nf1 = new Intl.NumberFormat('en-US',{minimumFractionDigits:1, maximumFractionDigits:1});
+  const nfcmp = new Intl.NumberFormat('en-US',{notation:'compact', maximumFractionDigits:1});
+  const nfc = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
+  const fmt = v => nfc.format(v);
+
+  const els = {
+    total: document.getElementById('total'),
+    loading: document.getElementById('loading'),
+    startLabel: document.getElementById('startLabel'),
+    scaleSentence: document.getElementById('scaleSentence'),
+    releaseLabel: document.getElementById('releaseLabel'),
+    perHousehold: document.getElementById('perHousehold'),
+    perAdult: document.getElementById('perAdult'),
+  };
+
+  let perSec = 0;
+  let total = 0;
+  let last = performance.now();
+  let startMs = Date.parse(release.startISO);
+
+  function buildSentences(total){
+    const iphoneClasses = total / (release.iphone17Price * release.usGraduatesPerYear);
+    const electricMonths = total / (release.avgElectricBillMonthly * release.usHouseholds);
+    const rentMonths = total / (release.avgRentMonthly * release.usRenterHouseholds);
+    const teachers = total / release.teacherPay;
+    const studentDebtBorrowers = total / release.studentDebtBalance;
+    const studentClasses = studentDebtBorrowers / release.usGraduatesPerYear;
+    const childcareMonths = total / ((release.childcareCost / 12) * release.usBirthsPerYear);
+    const erDays = total / (release.erVisitCost * release.dailyERVisits);
+    const solarHomes = total / release.solarInstallCost;
+    const solarCities = solarHomes / release.solarCityHouseholds;
+    const premiums = total / release.familyPremium;
+    const premiumCities = premiums / release.tampaHouseholds;
+    const groceryFamilies = total / release.familyFoodAnnual;
+    const pellAwards = total / release.pellGrantMax;
+    const pellUniversities = pellAwards / release.largeUniversityEnrollment;
+    const tuitionDegrees = total / (release.publicTuitionAnnual * 4);
+    const disasterFamilies = total / release.femaHouseholdGrant;
+    const highwayMiles = total / release.interstateMileCost;
+    const lunchYears = total / (release.schoolLunchPerYear * release.usK12Students);
+    const mortgageMonths = total / (release.avgMortgagePayment * release.usMortgageHouseholds);
+    const autoMonths = total / (release.avgAutoPayment * release.autoLoanHouseholds);
+    const gasFillRounds = total / (release.avgGasFill * release.usHouseholds);
+    const waterMonths = total / (release.avgWaterBillMonthly * release.usHouseholds);
+    const broadbandMonths = total / (release.avgBroadbandBillMonthly * release.usHouseholds);
+    const nurseJobs = total / release.nurseSalary;
+    const teacherDistricts = teachers / release.largeDistrictTeachers;
+    const bridgesRepaired = total / release.bridgeRehabCost;
+    const waterMainMiles = total / release.waterMainMileCost;
+    const portCranes = total / release.portCraneCost;
+    const smallFactories = total / release.smallFactoryCost;
+    const childTaxCredits = total / release.childTaxCredit;
+    const schoolLaptops = total / release.schoolLaptopCost;
+    const fireTrucks = total / release.fireTruckCost;
+    const publicSafetyStations = total / release.publicSafetyStationCost;
+    const apprenticeships = total / release.apprenticeshipCost;
+    const electricBuses = total / release.electricSchoolBusCost;
+    const fiberMiles = total / release.fiberMileCost;
+    const firefighterGearSets = total / release.firefighterGearSetCost;
+
+    return [
+      `Paying the electric bill of every U.S. household for the next <strong>${nf1.format(electricMonths)}</strong> months.`,
+      `Zeroing out student loans for <strong>${nf0.format(studentDebtBorrowers)}</strong> borrowers.`,
+      `Paying childcare for every baby born this year for the next <strong>${nf1.format(childcareMonths)}</strong> months.`,
+      `Picking up every emergency room visit in the country for the next <strong>${nf1.format(erDays)}</strong> days.`,
+      `Installing rooftop solar on <strong>${nf0.format(solarHomes)}</strong> homes.`,
+      `Covering a full year of employer health premiums for <strong>${nf0.format(premiums)}</strong> families.`,
+      `Buying a year's worth of groceries for <strong>${nf0.format(groceryFamilies)}</strong> families of four.`,
+      `Funding the maximum Pell Grant for <strong>${nf0.format(pellAwards)}</strong> students—enough to fill <strong>${nf0.format(pellUniversities)}</strong> large universities.`,
+      `Covering four full years of in-state tuition for <strong>${nf0.format(tuitionDegrees)}</strong> public university students.`,
+      `Rebuilding <strong>${nf0.format(disasterFamilies)}</strong> households with full FEMA disaster grants.`,
+      `Repaving <strong>${nf1.format(highwayMiles)}</strong> miles of interstate highway.`,
+      `Funding free school meals to every K-12 student for the next <strong>${nf1.format(lunchYears)}</strong> years.`,
+      `Making the average monthly car payment for every auto borrower for the next <strong>${nf1.format(autoMonths)}</strong> months.`,
+      `Filling every household gas tank <strong>${nf1.format(gasFillRounds)}</strong> times.`,
+      `Paying the water bill in every household for the next <strong>${nf1.format(waterMonths)}</strong> months.`,
+      `Covering broadband service in every household for the next <strong>${nf1.format(broadbandMonths)}</strong> months.`,
+      `Paying full-year salaries for <strong>${nf0.format(nurseJobs)}</strong> registered nurses.`,
+      `Keeping <strong>${nf0.format(teacherDistricts)}</strong> large school districts fully staffed for the next year.`,
+      `Rehabilitating <strong>${nf0.format(bridgesRepaired)}</strong> highway bridges.`,
+      `Replacing <strong>${nf1.format(waterMainMiles)}</strong> miles of aging water mains.`,
+      `Building <strong>${nf0.format(smallFactories)}</strong> advanced manufacturing plants.`,
+      `Purchasing <strong>${nf0.format(schoolLaptops)}</strong> classroom laptops.`,
+      `Putting <strong>${nf0.format(fireTrucks)}</strong> new fire engines into service.`,
+      `Constructing <strong>${nf0.format(publicSafetyStations)}</strong> fire and police stations.`,
+      `Funding registered apprenticeships for <strong>${nf0.format(apprenticeships)}</strong> workers.`,
+      `Buying <strong>${nf0.format(electricBuses)}</strong> electric school buses.`,
+      `Running fiber broadband across <strong>${nf1.format(fiberMiles)}</strong> miles of rural roads.`,
+      `Outfitting <strong>${nf0.format(firefighterGearSets)}</strong> firefighters with new gear.`,
+    ];
+  }
+
+  let sentences = [];
+  let sentenceIndex = null;
+  let isTransitioning = false;
+  const ROTATE_MS = 10_000;
+
+  function tick(now){
+    const dt = (now - last)/1000;
+    last = now;
+
+    if (perSec !== null) {
+      total += perSec * dt;
+
+      els.total.textContent = fmt(total);
+      if (els.perHousehold) {
+        const householdShare = total / release.usHouseholds;
+        els.perHousehold.textContent = fmt(householdShare);
+      }
+      if (els.perAdult) {
+        const adultShare = total / release.usAdultPopulation;
+        els.perAdult.textContent = fmt(adultShare);
+      }
+
+      sentences = buildSentences(total);
+
+      if (sentenceIndex === null && sentences.length) {
+        sentenceIndex = Math.floor(Math.random() * sentences.length);
+      }
+
+      if (!isTransitioning && sentences.length) {
+        els.scaleSentence.innerHTML = sentences[sentenceIndex];
+      }
+
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  setInterval(() => {
+    if (!sentences.length) return;
+    if (sentenceIndex === null) {
+      sentenceIndex = Math.floor(Math.random() * sentences.length);
+    }
+    isTransitioning = true;
+    els.scaleSentence.classList.add('fading');
+    setTimeout(() => {
+      sentenceIndex = (sentenceIndex + 1) % sentences.length;
+      els.scaleSentence.innerHTML = sentences[sentenceIndex];
+      els.scaleSentence.classList.remove('fading');
+      isTransitioning = false;
+    }, 250);
+  }, ROTATE_MS);
+
+  async function fetchLatestTariffs(){
+    let perSecond = localStorage.getItem(`tariffPerSec-${release.startISO}`);
+    if (perSecond)
+      return Number(perSecond);
+
+    try {
+      const TDATA_ENDPOINT = 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_4?sort=-record_date&format=json&filter=classification_desc:eq:Customs%20Duties,record_date:gt:2025-03-31';
+      const response = await fetch(TDATA_ENDPOINT);
+      if (!response.ok) throw new Error(`Treasury API error ${response.status}`);
+      const json = await response.json();
+      const entries = json.data.filter(entry => entry.classification_desc === 'Customs Duties');
+
+      const totalDutiesUSD = entries.reduce((tot, cur) => {
+        return tot + Number(cur.current_month_net_rcpt_amt)
+      }, 0)
+      const totalDays = entries.reduce((tot, cur) => {
+        return tot + Number(cur.record_calendar_day)
+      }, 0);
+      perSecond = totalDutiesUSD / (totalDays * 86400);
+      localStorage.setItem(`tariffPerSec-${release.startISO}`, perSecond);
+      return perSecond;
+    } catch (err) {
+      console.warn('Tariff data fetch failed, using fallback', err);
+    }
+  }
+
+  async function init(){
+    perSec = await fetchLatestTariffs();
+    els.loading.classList.add('hidden')
+    startMs = Date.parse(release.startISO);
+    total = ((Date.now() - startMs) / 1000) * perSec;
+    last = performance.now();
+    requestAnimationFrame(tick);
+  }
+
+  init();
+
+})();
+</script>
+</body>
+</html>

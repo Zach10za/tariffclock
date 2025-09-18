@@ -1,80 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>The Cost of Tariffs</title>
-<style>
-  :root{
-    --bg:#0b1020; --card:#111936; --fg:#e9eefc; --muted:#9fb0da;
-    --accent:#36e08f; --accent2:#ff6b6b; --shadow:0 10px 35px rgba(0,0,0,.35)
-  }
-  html,body{height:100%}
-  body{
-    margin:0; background:linear-gradient(180deg,#0a0f1e,#101936);
-    color:var(--fg); font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-    display:flex; align-items:center; justify-content:center; padding:32px
-  }
-  .wrap{
-    max-width:960px; width:100%; min-height:100%;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:28px; text-align:center
-  }
-  h1{margin:0;font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:.4px}
-  .tagline{margin:0; max-width:640px; color:var(--muted); font-size:1rem}
-  .total{
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-size:8vw; font-weight:800; letter-spacing:clamp(0.12rem,1vw,0.35rem); color:var(--accent);
-    text-shadow:0 0 22px rgba(54,224,143,.35); padding:0 clamp(1.5rem,4vw,4rem);
-    box-sizing:border-box; width:100%; max-width:100%; display:flex;
-    justify-content:center; align-items:center; text-align:center; margin:0 auto;
-  }
-  .scaleLead{margin:0; color:var(--muted); font-size:1rem; letter-spacing:.03em}
-  .loading{
-    display:flex; gap:8px; align-items:center; justify-content:center;
-    color:#7f90c4; font-size:.95rem; margin-top:12px;
-  }
-  .loading .dot{
-    width:8px; height:8px; border-radius:50%; background:#7f90c4;
-    animation:pulse 0.8s ease-in-out infinite alternate;
-  }
-  .loading .dot:nth-child(1){animation-delay:0s}
-  .loading .dot:nth-child(2){animation-delay:.15s}
-  .loading .dot:nth-child(3){animation-delay:.3s}
-  .loading .text{letter-spacing:.04em}
-  .loading.hidden{display:none}
-  @keyframes pulse{from{opacity:.3; transform:scale(.8)}to{opacity:1; transform:scale(1.2)}}
-  .percapita{
-    display:flex; gap:24px; justify-content:center; align-items:center; margin:4px 0 12px;
-    color:#aebce9; font-size:clamp(.85rem,2.3vw,1.05rem);
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-variant-numeric: tabular-nums;
-  }
-  .percapita span{display:flex; flex-direction:column; gap:4px; align-items:center}
-  .percapita small{color:#6f7dab; text-transform:uppercase; letter-spacing:.12em; font-size:.68rem}
-  .percapita strong{
-    color:var(--fg);
-  }
-  .narrative{display:flex; flex-direction:column; align-items:center; width:100%; margin:0; padding:0 16px; min-height:100px}
-  .narrative p{
-    margin:0; color:#d5e0ff; font-size:clamp(20px,3vw,32px); line-height:1.4;
-    white-space:normal; text-wrap:balance; opacity:1; transition:opacity .4s ease-in-out
-  }
-  .narrative p.fading{opacity:0}
-  .narrative strong{
-    color:var(--accent);
-    font-weight:700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-variant-numeric: tabular-nums;
-  }
-  .foot{color:#b9c6ec; font-size:.85rem; max-width:680px; line-height:1.4}
-  .sources{color:#7487c0; font-size:.8rem}
-  @media (max-width:600px){
-    body{padding:18px}
-    .wrap{gap:18px}
-    .percapita{flex-direction:column; gap:6px}
-  }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Cost of Tariffs</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27g%27%20x1%3D%270%27%20x2%3D%271%27%20y1%3D%271%27%20y2%3D%270%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%23101936%27/%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%230b1020%27/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20fill%3D%27url%28%23g%29%27%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27/%3E%3Cpath%20fill%3D%27none%27%20stroke%3D%27%2336e08f%27%20stroke-width%3D%275%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20d%3D%27M12%2040l12-12%2010%208%2018-18%27/%3E%3Cpath%20fill%3D%27%2336e08f%27%20d%3D%27M46%2018h10v10h-6v6h-4z%27/%3E%3Ccircle%20cx%3D%2718%27%20cy%3D%2744%27%20r%3D%274%27%20fill%3D%27%23ff6b6b%27%20opacity%3D%27.85%27/%3E%3C/svg%3E" />
+  <style>
+    :root{
+      --bg:#0b1020; --card:#111936; --fg:#e9eefc; --muted:#9fb0da;
+      --accent:#36e08f; --accent2:#ff6b6b; --shadow:0 10px 35px rgba(0,0,0,.35)
+    }
+    html,body{height:100%}
+    body{
+      margin:0; background:linear-gradient(180deg,#0a0f1e,#101936);
+      color:var(--fg); font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      display:flex; align-items:center; justify-content:center; padding:32px
+    }
+    .wrap{
+      max-width:960px; width:100%; min-height:100%;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:28px; text-align:center
+    }
+    h1{margin:0;font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:.4px}
+    .tagline{margin:0; max-width:640px; color:var(--muted); font-size:1rem}
+    .total{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:8vw; font-weight:800; letter-spacing:clamp(0.12rem,1vw,0.35rem); color:var(--accent);
+      text-shadow:0 0 22px rgba(54,224,143,.35); padding:0 clamp(1.5rem,4vw,4rem);
+      box-sizing:border-box; width:100%; max-width:100%; display:flex;
+      justify-content:center; align-items:center; text-align:center; margin:0 auto;
+    }
+    .scaleLead{margin:0; color:var(--muted); font-size:1rem; letter-spacing:.03em}
+    .loading{
+      display:flex; gap:8px; align-items:center; justify-content:center;
+      color:#7f90c4; font-size:.95rem; margin-top:12px;
+    }
+    .loading .dot{
+      width:8px; height:8px; border-radius:50%; background:#7f90c4;
+      animation:pulse 0.8s ease-in-out infinite alternate;
+    }
+    .loading .dot:nth-child(1){animation-delay:0s}
+    .loading .dot:nth-child(2){animation-delay:.15s}
+    .loading .dot:nth-child(3){animation-delay:.3s}
+    .loading .text{letter-spacing:.04em}
+    .loading.hidden{display:none}
+    @keyframes pulse{from{opacity:.3; transform:scale(.8)}to{opacity:1; transform:scale(1.2)}}
+    .percapita{
+      display:flex; gap:24px; justify-content:center; align-items:center; margin:4px 0 12px;
+      color:#aebce9; font-size:clamp(.85rem,2.3vw,1.05rem);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .percapita span{display:flex; flex-direction:column; gap:4px; align-items:center}
+    .percapita small{color:#6f7dab; text-transform:uppercase; letter-spacing:.12em; font-size:.68rem}
+    .percapita strong{
+      color:var(--fg);
+    }
+    .narrative{display:flex; flex-direction:column; align-items:center; width:100%; margin:0; padding:0 16px; min-height:100px}
+    .narrative p{
+      margin:0; color:#d5e0ff; font-size:clamp(20px,3vw,32px); line-height:1.4;
+      white-space:normal; text-wrap:balance; opacity:1; transition:opacity .4s ease-in-out
+    }
+    .narrative p.fading{opacity:0}
+    .narrative strong{
+      color:var(--accent);
+      font-weight:700;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-variant-numeric: tabular-nums;
+    }
+    .foot{color:#b9c6ec; font-size:.85rem; max-width:680px; line-height:1.4}
+    .sources{color:#7487c0; font-size:.8rem}
+    @media (max-width:600px){
+      body{padding:18px}
+      .wrap{gap:18px}
+      .percapita{flex-direction:column; gap:6px}
+    }
+  </style>
 </head>
 <body>
 <div class="wrap">
@@ -113,481 +114,481 @@
 </div>
 
 <script>
-(() => {
-  // ---------- Static configuration & live Treasury data fetch ----------
-  // Reference values for translating tariff totals into household-meaningful comparisons.
-  const release = {
-    startISO: '2025-04-01T00:00:00Z',
-    iphone17Price: 799, // Retail for iPhone 17
-    studentDebtBalance: 37_000, // Average federal student loan balance per borrower (2023, Dept. of Education)
-    teacherPay: 69_480, // Median public school teacher pay (BLS OEWS May 2023)
-    childcareCost: 12_000, // Approx. annual infant childcare cost per Child Care Aware national average
-    erVisitCost: 2_600, // Mean emergency room visit charge (HCUP 2022)
-    solarInstallCost: 25_000, // Average 7kW residential solar installation before incentives (SEIA 2024)
-    familyPremium: 23_968, // Average employer family health insurance premium (KFF 2023)
-    pellGrantMax: 7_395, // 2024-25 maximum Pell Grant award
-    usGraduatesPerYear: 3_700_000, // U.S. high school graduates annually (NCES)
-    usBirthsPerYear: 3_700_000, // Annual U.S. births (CDC 2023)
-    dailyERVisits: 400_000, // Approximate national ER visits per day (HCUP 2022)
-    largeUniversityEnrollment: 30_000, // Enrollment at a large state university campus
-    usHouseholds: 128_000_000, // Total U.S. households (ACS 2023)
-    usAdultPopulation: 258_000_000, // Adults 18+ (Census 2023)
-    avgElectricBillMonthly: 137, // Average monthly residential electric bill (EIA 2023)
-    familyFoodAnnual: 11_000, // Average annual food-at-home spend for a family of four (USDA 2024)
-    publicTuitionAnnual: 11_260, // Average in-state public 4-yr tuition & fees (College Board 2023)
-    interstateMileCost: 20_000_000, // Typical cost to rebuild a mile of interstate (FHWA range)
-    femaHouseholdGrant: 35_500, // Average Individual Assistance grant after major disasters (FEMA 2023)
-    usK12Students: 50_000_000, // K-12 enrollment (NCES 2023)
-    schoolLunchPerYear: 720, // School meals per student per year (~$4 per meal, 180 days)
-    avgMortgagePayment: 2_100, // Average monthly mortgage payment (MBA National Delinquency Survey 2024)
-    usMortgageHouseholds: 50_000_000, // Owner-occupied households with mortgages (Census CPS 2023)
-    avgAutoPayment: 738, // Average new car monthly payment (Experian State of the Automotive Finance Market 2024)
-    autoLoanHouseholds: 45_000_000, // Households with auto loans or leases (Fed Survey of Consumer Finances)
-    avgGasFill: 55, // Typical cost to fill a 14-gallon tank at $3.90/gal (AAA May 2024)
-    avgWaterBillMonthly: 75, // Median monthly residential water bill (Circle of Blue 2024)
-    avgBroadbandBillMonthly: 75, // Average monthly broadband bill (Leichtman Research Group 2024)
-    nurseSalary: 89_010, // Median registered nurse pay (BLS OEWS May 2023)
-    largeDistrictTeachers: 2_000, // Teachers employed in a large urban district (NCES common size)
-    bridgeRehabCost: 3_500_000, // Typical cost to rehabilitate a highway bridge (FHWA 2023)
-    waterMainMileCost: 1_100_000, // Average cost to replace a mile of water main (AWWA 2024)
-    portCraneCost: 12_000_000, // Ship-to-shore crane cost (American Association of Port Authorities)
-    smallFactoryCost: 80_000_000, // Capital cost for a modern small manufacturing plant (NIST MEP 2024)
-    childTaxCredit: 2_000, // Full Child Tax Credit per child (IRS 2024)
-    schoolLaptopCost: 600, // All-in cost for a durable classroom laptop (NCES tech budgets)
-    fireTruckCost: 750_000, // Average cost of a municipal fire engine (NFPA 2024)
-    publicSafetyStationCost: 18_000_000, // Turn-key cost for a combined fire/police station (ICMA capital survey)
-    apprenticeshipCost: 14_000, // Federal registered apprenticeship cost per participant (DOL 2024)
-    electricSchoolBusCost: 400_000, // Average price of an electric school bus (EPA Clean School Bus Program)
-    fiberMileCost: 35_000, // Cost per mile to deploy rural fiber broadband (NTIA 2024)
-    firefighterGearSetCost: 18_000, // Complete turnout gear and equipment per firefighter (NFPA 2024)
-    communityCollegeTuitionAnnual: 3_990, // Average in-district community college tuition & fees (College Board 2023)
-    affordableHousingUnitCost: 220_000, // Typical cost to build a new affordable apartment (Urban Institute 2024)
-    heatPumpInstallCost: 15_000, // Installed cost for a cold-climate heat pump system (DOE 2024)
-    leadServiceLineReplacementCost: 12_000, // Average cost to replace a lead service line (EPA 2023)
-    wildfireAcreTreatmentCost: 1_400, // Cost per acre for forest fuel reduction (USFS 2023)
-    mentalHealthSessionCost: 150, // Average out-of-pocket cost per therapy session (APA 2024)
-    mealsOnWheelsCostPerMeal: 7, // Meals on Wheels average cost per delivered meal (2024 network data)
-    foodBankMealCost: 3.6, // Average sourcing cost per food bank meal (Feeding America 2024)
-    insulinMonthlyCost: 450, // Average monthly insulin list price before caps (KFF 2023)
-    libraryRenovationCost: 10_000_000, // Major public library gut renovation (IMLS case studies)
-    stemScholarshipCost: 40_000, // Four-year STEM scholarship at public universities (NSF estimates)
-    homeResilienceUpgradeCost: 9_000, // Cost to harden a home against hurricanes (IBHS FORTIFIED 2024)
-    dvShelterNightCost: 150, // Average cost to provide a night of safe shelter (NNEDV 2023)
-    jobTrainingProgramCost: 7_500, // Cost per participant for intensive workforce training (DOL 2024)
-    prenatalVisitCost: 160, // Average prenatal care visit cost (ACOG 2024)
-    vaccineDoseCost: 20, // Federal contract price for routine childhood vaccines (CDC 2024)
-    ruralWaterSystemCost: 2_500_000, // Typical cost to build a rural community water system (USDA RD 2024)
-    resilientMicrogridCost: 5_000_000 // Median cost for a critical-facility microgrid (DOE 2024)
-  };
+  (() => {
+    // ---------- Static configuration & live Treasury data fetch ----------
+    // Reference values for translating tariff totals into household-meaningful comparisons.
+    const release = {
+      startISO: '2025-04-01T00:00:00Z',
+      iphone17Price: 799, // Retail for iPhone 17
+      studentDebtBalance: 37_000, // Average federal student loan balance per borrower (2023, Dept. of Education)
+      teacherPay: 69_480, // Median public school teacher pay (BLS OEWS May 2023)
+      childcareCost: 12_000, // Approx. annual infant childcare cost per Child Care Aware national average
+      erVisitCost: 2_600, // Mean emergency room visit charge (HCUP 2022)
+      solarInstallCost: 25_000, // Average 7kW residential solar installation before incentives (SEIA 2024)
+      familyPremium: 23_968, // Average employer family health insurance premium (KFF 2023)
+      pellGrantMax: 7_395, // 2024-25 maximum Pell Grant award
+      usGraduatesPerYear: 3_700_000, // U.S. high school graduates annually (NCES)
+      usBirthsPerYear: 3_700_000, // Annual U.S. births (CDC 2023)
+      dailyERVisits: 400_000, // Approximate national ER visits per day (HCUP 2022)
+      largeUniversityEnrollment: 30_000, // Enrollment at a large state university campus
+      usHouseholds: 128_000_000, // Total U.S. households (ACS 2023)
+      usAdultPopulation: 258_000_000, // Adults 18+ (Census 2023)
+      avgElectricBillMonthly: 137, // Average monthly residential electric bill (EIA 2023)
+      familyFoodAnnual: 11_000, // Average annual food-at-home spend for a family of four (USDA 2024)
+      publicTuitionAnnual: 11_260, // Average in-state public 4-yr tuition & fees (College Board 2023)
+      interstateMileCost: 20_000_000, // Typical cost to rebuild a mile of interstate (FHWA range)
+      femaHouseholdGrant: 35_500, // Average Individual Assistance grant after major disasters (FEMA 2023)
+      usK12Students: 50_000_000, // K-12 enrollment (NCES 2023)
+      schoolLunchPerYear: 720, // School meals per student per year (~$4 per meal, 180 days)
+      avgMortgagePayment: 2_100, // Average monthly mortgage payment (MBA National Delinquency Survey 2024)
+      usMortgageHouseholds: 50_000_000, // Owner-occupied households with mortgages (Census CPS 2023)
+      avgAutoPayment: 738, // Average new car monthly payment (Experian State of the Automotive Finance Market 2024)
+      autoLoanHouseholds: 45_000_000, // Households with auto loans or leases (Fed Survey of Consumer Finances)
+      avgGasFill: 55, // Typical cost to fill a 14-gallon tank at $3.90/gal (AAA May 2024)
+      avgWaterBillMonthly: 75, // Median monthly residential water bill (Circle of Blue 2024)
+      avgBroadbandBillMonthly: 75, // Average monthly broadband bill (Leichtman Research Group 2024)
+      nurseSalary: 89_010, // Median registered nurse pay (BLS OEWS May 2023)
+      largeDistrictTeachers: 2_000, // Teachers employed in a large urban district (NCES common size)
+      bridgeRehabCost: 3_500_000, // Typical cost to rehabilitate a highway bridge (FHWA 2023)
+      waterMainMileCost: 1_100_000, // Average cost to replace a mile of water main (AWWA 2024)
+      portCraneCost: 12_000_000, // Ship-to-shore crane cost (American Association of Port Authorities)
+      smallFactoryCost: 80_000_000, // Capital cost for a modern small manufacturing plant (NIST MEP 2024)
+      childTaxCredit: 2_000, // Full Child Tax Credit per child (IRS 2024)
+      schoolLaptopCost: 600, // All-in cost for a durable classroom laptop (NCES tech budgets)
+      fireTruckCost: 750_000, // Average cost of a municipal fire engine (NFPA 2024)
+      publicSafetyStationCost: 18_000_000, // Turn-key cost for a combined fire/police station (ICMA capital survey)
+      apprenticeshipCost: 14_000, // Federal registered apprenticeship cost per participant (DOL 2024)
+      electricSchoolBusCost: 400_000, // Average price of an electric school bus (EPA Clean School Bus Program)
+      fiberMileCost: 35_000, // Cost per mile to deploy rural fiber broadband (NTIA 2024)
+      firefighterGearSetCost: 18_000, // Complete turnout gear and equipment per firefighter (NFPA 2024)
+      communityCollegeTuitionAnnual: 3_990, // Average in-district community college tuition & fees (College Board 2023)
+      affordableHousingUnitCost: 220_000, // Typical cost to build a new affordable apartment (Urban Institute 2024)
+      heatPumpInstallCost: 15_000, // Installed cost for a cold-climate heat pump system (DOE 2024)
+      leadServiceLineReplacementCost: 12_000, // Average cost to replace a lead service line (EPA 2023)
+      wildfireAcreTreatmentCost: 1_400, // Cost per acre for forest fuel reduction (USFS 2023)
+      mentalHealthSessionCost: 150, // Average out-of-pocket cost per therapy session (APA 2024)
+      mealsOnWheelsCostPerMeal: 7, // Meals on Wheels average cost per delivered meal (2024 network data)
+      foodBankMealCost: 3.6, // Average sourcing cost per food bank meal (Feeding America 2024)
+      insulinMonthlyCost: 450, // Average monthly insulin list price before caps (KFF 2023)
+      libraryRenovationCost: 10_000_000, // Major public library gut renovation (IMLS case studies)
+      stemScholarshipCost: 40_000, // Four-year STEM scholarship at public universities (NSF estimates)
+      homeResilienceUpgradeCost: 9_000, // Cost to harden a home against hurricanes (IBHS FORTIFIED 2024)
+      dvShelterNightCost: 150, // Average cost to provide a night of safe shelter (NNEDV 2023)
+      jobTrainingProgramCost: 7_500, // Cost per participant for intensive workforce training (DOL 2024)
+      prenatalVisitCost: 160, // Average prenatal care visit cost (ACOG 2024)
+      vaccineDoseCost: 20, // Federal contract price for routine childhood vaccines (CDC 2024)
+      ruralWaterSystemCost: 2_500_000, // Typical cost to build a rural community water system (USDA RD 2024)
+      resilientMicrogridCost: 5_000_000 // Median cost for a critical-facility microgrid (DOE 2024)
+    };
 
-  // Human-friendly number formatters used throughout the UI.
-  const nf0 = new Intl.NumberFormat('en-US',{minimumFractionDigits:0, maximumFractionDigits:0});
-  const nf1 = new Intl.NumberFormat('en-US',{minimumFractionDigits:1, maximumFractionDigits:1});
-  const nfc = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
-  const fmt = v => nfc.format(v);
+    // Human-friendly number formatters used throughout the UI.
+    const nf0 = new Intl.NumberFormat('en-US',{minimumFractionDigits:0, maximumFractionDigits:0});
+    const nf1 = new Intl.NumberFormat('en-US',{minimumFractionDigits:1, maximumFractionDigits:1});
+    const nfc = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
+    const fmt = v => nfc.format(v);
 
-  // Cache key DOM nodes once to avoid repeated lookups in the animation loop.
-  const els = {
-    total: document.getElementById('total'),
-    loading: document.getElementById('loading'),
-    loadingText: document.getElementById('loadingText'),
-    scaleSentence: document.getElementById('scaleSentence'),
-    perHousehold: document.getElementById('perHousehold'),
-    perAdult: document.getElementById('perAdult'),
-  };
+    // Cache key DOM nodes once to avoid repeated lookups in the animation loop.
+    const els = {
+      total: document.getElementById('total'),
+      loading: document.getElementById('loading'),
+      loadingText: document.getElementById('loadingText'),
+      scaleSentence: document.getElementById('scaleSentence'),
+      perHousehold: document.getElementById('perHousehold'),
+      perAdult: document.getElementById('perAdult'),
+    };
 
-  // Core timing metadata and cache key for the fetched Treasury series.
-  const RELEASE_START_MS = Date.parse(release.startISO);
-  const MS_PER_DAY = 86_400_000;
-  const SECONDS_PER_DAY = 86_400;
-  const STORAGE_KEY_VERSION = 'v1';
-  const STORAGE_KEY = `tariffSeries-${STORAGE_KEY_VERSION}-${release.startISO}`;
+    // Core timing metadata and cache key for the fetched Treasury series.
+    const RELEASE_START_MS = Date.parse(release.startISO);
+    const MS_PER_DAY = 86_400_000;
+    const SECONDS_PER_DAY = 86_400;
+    const STORAGE_KEY_VERSION = 'v1';
+    const STORAGE_KEY = `tariffSeries-${STORAGE_KEY_VERSION}-${release.startISO}`;
 
-  // Mutable runtime state populated after the data model is constructed.
-  let perSec = 0;
-  let total = 0;
-  let tariffModel = null;
+    // Mutable runtime state populated after the data model is constructed.
+    let perSec = 0;
+    let total = 0;
+    let tariffModel = null;
 
-  // Translate the ever-growing total into concrete comparisons for the narrative rotator.
-  function buildSentences(total){
-    const iphoneClasses = total / (release.iphone17Price * release.usGraduatesPerYear);
-    const electricMonths = total / (release.avgElectricBillMonthly * release.usHouseholds);
-    const teachers = total / release.teacherPay;
-    const studentDebtBorrowers = total / release.studentDebtBalance;
-    const childcareMonths = total / ((release.childcareCost / 12) * release.usBirthsPerYear);
-    const erDays = total / (release.erVisitCost * release.dailyERVisits);
-    const solarHomes = total / release.solarInstallCost;
-    const premiums = total / release.familyPremium;
-    const groceryFamilies = total / release.familyFoodAnnual;
-    const pellAwards = total / release.pellGrantMax;
-    const pellUniversities = pellAwards / release.largeUniversityEnrollment;
-    const tuitionDegrees = total / (release.publicTuitionAnnual * 4);
-    const disasterFamilies = total / release.femaHouseholdGrant;
-    const highwayMiles = total / release.interstateMileCost;
-    const lunchYears = total / (release.schoolLunchPerYear * release.usK12Students);
-    const mortgageMonths = total / (release.avgMortgagePayment * release.usMortgageHouseholds);
-    const autoMonths = total / (release.avgAutoPayment * release.autoLoanHouseholds);
-    const gasFillRounds = total / (release.avgGasFill * release.usHouseholds);
-    const waterMonths = total / (release.avgWaterBillMonthly * release.usHouseholds);
-    const broadbandMonths = total / (release.avgBroadbandBillMonthly * release.usHouseholds);
-    const nurseJobs = total / release.nurseSalary;
-    const teacherDistricts = teachers / release.largeDistrictTeachers;
-    const bridgesRepaired = total / release.bridgeRehabCost;
-    const waterMainMiles = total / release.waterMainMileCost;
-    const portCranes = total / release.portCraneCost;
-    const smallFactories = total / release.smallFactoryCost;
-    const childTaxCredits = total / release.childTaxCredit;
-    const schoolLaptops = total / release.schoolLaptopCost;
-    const fireTrucks = total / release.fireTruckCost;
-    const publicSafetyStations = total / release.publicSafetyStationCost;
-    const apprenticeships = total / release.apprenticeshipCost;
-    const electricBuses = total / release.electricSchoolBusCost;
-    const fiberMiles = total / release.fiberMileCost;
-    const firefighterGearSets = total / release.firefighterGearSetCost;
-    const communityCollegeYears = total / release.communityCollegeTuitionAnnual;
-    const affordableUnits = total / release.affordableHousingUnitCost;
-    const heatPumps = total / release.heatPumpInstallCost;
-    const leadPipes = total / release.leadServiceLineReplacementCost;
-    const wildfireAcres = total / release.wildfireAcreTreatmentCost;
-    const mentalHealthSessions = total / release.mentalHealthSessionCost;
-    const mealsDelivered = total / release.mealsOnWheelsCostPerMeal;
-    const foodBankMeals = total / release.foodBankMealCost;
-    const insulinMonths = total / release.insulinMonthlyCost;
-    const libraryRenovations = total / release.libraryRenovationCost;
-    const stemScholarships = total / release.stemScholarshipCost;
-    const resilientHomes = total / release.homeResilienceUpgradeCost;
-    const dvShelterNights = total / release.dvShelterNightCost;
-    const jobTrainingSlots = total / release.jobTrainingProgramCost;
-    const prenatalVisits = total / release.prenatalVisitCost;
-    const vaccineDoses = total / release.vaccineDoseCost;
-    const cleanWaterSystems = total / release.ruralWaterSystemCost;
-    const microgrids = total / release.resilientMicrogridCost;
+    // Translate the ever-growing total into concrete comparisons for the narrative rotator.
+    function buildSentences(total){
+      const iphoneClasses = total / (release.iphone17Price * release.usGraduatesPerYear);
+      const electricMonths = total / (release.avgElectricBillMonthly * release.usHouseholds);
+      const teachers = total / release.teacherPay;
+      const studentDebtBorrowers = total / release.studentDebtBalance;
+      const childcareMonths = total / ((release.childcareCost / 12) * release.usBirthsPerYear);
+      const erDays = total / (release.erVisitCost * release.dailyERVisits);
+      const solarHomes = total / release.solarInstallCost;
+      const premiums = total / release.familyPremium;
+      const groceryFamilies = total / release.familyFoodAnnual;
+      const pellAwards = total / release.pellGrantMax;
+      const pellUniversities = pellAwards / release.largeUniversityEnrollment;
+      const tuitionDegrees = total / (release.publicTuitionAnnual * 4);
+      const disasterFamilies = total / release.femaHouseholdGrant;
+      const highwayMiles = total / release.interstateMileCost;
+      const lunchYears = total / (release.schoolLunchPerYear * release.usK12Students);
+      const mortgageMonths = total / (release.avgMortgagePayment * release.usMortgageHouseholds);
+      const autoMonths = total / (release.avgAutoPayment * release.autoLoanHouseholds);
+      const gasFillRounds = total / (release.avgGasFill * release.usHouseholds);
+      const waterMonths = total / (release.avgWaterBillMonthly * release.usHouseholds);
+      const broadbandMonths = total / (release.avgBroadbandBillMonthly * release.usHouseholds);
+      const nurseJobs = total / release.nurseSalary;
+      const teacherDistricts = teachers / release.largeDistrictTeachers;
+      const bridgesRepaired = total / release.bridgeRehabCost;
+      const waterMainMiles = total / release.waterMainMileCost;
+      const portCranes = total / release.portCraneCost;
+      const smallFactories = total / release.smallFactoryCost;
+      const childTaxCredits = total / release.childTaxCredit;
+      const schoolLaptops = total / release.schoolLaptopCost;
+      const fireTrucks = total / release.fireTruckCost;
+      const publicSafetyStations = total / release.publicSafetyStationCost;
+      const apprenticeships = total / release.apprenticeshipCost;
+      const electricBuses = total / release.electricSchoolBusCost;
+      const fiberMiles = total / release.fiberMileCost;
+      const firefighterGearSets = total / release.firefighterGearSetCost;
+      const communityCollegeYears = total / release.communityCollegeTuitionAnnual;
+      const affordableUnits = total / release.affordableHousingUnitCost;
+      const heatPumps = total / release.heatPumpInstallCost;
+      const leadPipes = total / release.leadServiceLineReplacementCost;
+      const wildfireAcres = total / release.wildfireAcreTreatmentCost;
+      const mentalHealthSessions = total / release.mentalHealthSessionCost;
+      const mealsDelivered = total / release.mealsOnWheelsCostPerMeal;
+      const foodBankMeals = total / release.foodBankMealCost;
+      const insulinMonths = total / release.insulinMonthlyCost;
+      const libraryRenovations = total / release.libraryRenovationCost;
+      const stemScholarships = total / release.stemScholarshipCost;
+      const resilientHomes = total / release.homeResilienceUpgradeCost;
+      const dvShelterNights = total / release.dvShelterNightCost;
+      const jobTrainingSlots = total / release.jobTrainingProgramCost;
+      const prenatalVisits = total / release.prenatalVisitCost;
+      const vaccineDoses = total / release.vaccineDoseCost;
+      const cleanWaterSystems = total / release.ruralWaterSystemCost;
+      const microgrids = total / release.resilientMicrogridCost;
 
-    // String fragments are pre-built here so the rotator can swap them in cheaply.
-    return [
-      `Paying the electric bill of every U.S. household for the next <strong>${nf1.format(electricMonths)}</strong> months.`,
-      `Zeroing out student loans for <strong>${nf0.format(studentDebtBorrowers)}</strong> borrowers.`,
-      `Paying childcare for every baby born this year for the next <strong>${nf1.format(childcareMonths)}</strong> months.`,
-      `Picking up every emergency room visit in the country for the next <strong>${nf1.format(erDays)}</strong> days.`,
-      `Installing rooftop solar on <strong>${nf0.format(solarHomes)}</strong> homes.`,
-      `Covering a full year of employer health premiums for <strong>${nf0.format(premiums)}</strong> families.`,
-      `Buying a year's worth of groceries for <strong>${nf0.format(groceryFamilies)}</strong> families of four.`,
-      `Funding the maximum Pell Grant for <strong>${nf0.format(pellAwards)}</strong> students—enough to fill <strong>${nf0.format(pellUniversities)}</strong> large universities.`,
-      `Covering four full years of in-state tuition for <strong>${nf0.format(tuitionDegrees)}</strong> public university students.`,
-      `Rebuilding <strong>${nf0.format(disasterFamilies)}</strong> households with full FEMA disaster grants.`,
-      `Repaving <strong>${nf1.format(highwayMiles)}</strong> miles of interstate highway.`,
-      `Funding free school meals to every K-12 student for the next <strong>${nf1.format(lunchYears)}</strong> years.`,
-      `Making the average monthly car payment for every auto borrower for the next <strong>${nf1.format(autoMonths)}</strong> months.`,
-      `Filling every household gas tank <strong>${nf1.format(gasFillRounds)}</strong> times.`,
-      `Paying the water bill in every household for the next <strong>${nf1.format(waterMonths)}</strong> months.`,
-      `Covering broadband service in every household for the next <strong>${nf1.format(broadbandMonths)}</strong> months.`,
-      `Paying full-year salaries for <strong>${nf0.format(nurseJobs)}</strong> registered nurses.`,
-      `Keeping <strong>${nf0.format(teacherDistricts)}</strong> large school districts fully staffed for the next year.`,
-      `Rehabilitating <strong>${nf0.format(bridgesRepaired)}</strong> highway bridges.`,
-      `Replacing <strong>${nf1.format(waterMainMiles)}</strong> miles of aging water mains.`,
-      `Building <strong>${nf0.format(smallFactories)}</strong> advanced manufacturing plants.`,
-      `Purchasing <strong>${nf0.format(schoolLaptops)}</strong> classroom laptops.`,
-      `Putting <strong>${nf0.format(fireTrucks)}</strong> new fire engines into service.`,
-      `Constructing <strong>${nf0.format(publicSafetyStations)}</strong> fire and police stations.`,
-      `Funding registered apprenticeships for <strong>${nf0.format(apprenticeships)}</strong> workers.`,
-      `Buying <strong>${nf0.format(electricBuses)}</strong> electric school buses.`,
-      `Running fiber broadband across <strong>${nf1.format(fiberMiles)}</strong> miles of rural roads.`,
-      `Outfitting <strong>${nf0.format(firefighterGearSets)}</strong> firefighters with new gear.`,
-      `Covering a year of community college tuition for <strong>${nf0.format(communityCollegeYears)}</strong> students.`,
-      `Building <strong>${nf0.format(affordableUnits)}</strong> new affordable apartments.`,
-      `Installing <strong>${nf0.format(heatPumps)}</strong> high-efficiency heat pumps in homes.`,
-      `Replacing <strong>${nf0.format(leadPipes)}</strong> lead drinking water lines.`,
-      `Treating <strong>${nf0.format(wildfireAcres)}</strong> acres of forest to prevent megafires.`,
-      `Providing <strong>${nf0.format(mentalHealthSessions)}</strong> mental health counseling sessions.`,
-      `Delivering <strong>${nf0.format(mealsDelivered)}</strong> Meals on Wheels visits to homebound seniors.`,
-      `Supplying <strong>${nf0.format(foodBankMeals)}</strong> food bank meals nationwide.`,
-      `Covering insulin for <strong>${nf0.format(insulinMonths)}</strong> person-months of diabetes care.`,
-      `Endowing <strong>${nf0.format(stemScholarships)}</strong> four-year STEM scholarships.`,
-      `Hardening <strong>${nf0.format(resilientHomes)}</strong> coastal homes against hurricane winds.`,
-      `Providing <strong>${nf0.format(dvShelterNights)}</strong> nights of safe shelter for survivors of domestic violence.`,
-      `Covering prenatal care visits for <strong>${nf0.format(prenatalVisits)}</strong> expectant parents.`,
-      `Buying <strong>${nf0.format(vaccineDoses)}</strong> routine childhood vaccine doses.`,
-      `Building <strong>${nf0.format(cleanWaterSystems)}</strong> rural community water systems.`,
-    ];
-  }
+      // String fragments are pre-built here so the rotator can swap them in cheaply.
+      return [
+        `Paying the electric bill of every U.S. household for the next <strong>${nf1.format(electricMonths)}</strong> months.`,
+        `Zeroing out student loans for <strong>${nf0.format(studentDebtBorrowers)}</strong> borrowers.`,
+        `Paying childcare for every baby born this year for the next <strong>${nf1.format(childcareMonths)}</strong> months.`,
+        `Picking up every emergency room visit in the country for the next <strong>${nf1.format(erDays)}</strong> days.`,
+        `Installing rooftop solar on <strong>${nf0.format(solarHomes)}</strong> homes.`,
+        `Covering a full year of employer health premiums for <strong>${nf0.format(premiums)}</strong> families.`,
+        `Buying a year's worth of groceries for <strong>${nf0.format(groceryFamilies)}</strong> families of four.`,
+        `Funding the maximum Pell Grant for <strong>${nf0.format(pellAwards)}</strong> students—enough to fill <strong>${nf0.format(pellUniversities)}</strong> large universities.`,
+        `Covering four full years of in-state tuition for <strong>${nf0.format(tuitionDegrees)}</strong> public university students.`,
+        `Rebuilding <strong>${nf0.format(disasterFamilies)}</strong> households with full FEMA disaster grants.`,
+        `Repaving <strong>${nf1.format(highwayMiles)}</strong> miles of interstate highway.`,
+        `Funding free school meals to every K-12 student for the next <strong>${nf1.format(lunchYears)}</strong> years.`,
+        `Making the average monthly car payment for every auto borrower for the next <strong>${nf1.format(autoMonths)}</strong> months.`,
+        `Filling every household gas tank <strong>${nf1.format(gasFillRounds)}</strong> times.`,
+        `Paying the water bill in every household for the next <strong>${nf1.format(waterMonths)}</strong> months.`,
+        `Covering broadband service in every household for the next <strong>${nf1.format(broadbandMonths)}</strong> months.`,
+        `Paying full-year salaries for <strong>${nf0.format(nurseJobs)}</strong> registered nurses.`,
+        `Keeping <strong>${nf0.format(teacherDistricts)}</strong> large school districts fully staffed for the next year.`,
+        `Rehabilitating <strong>${nf0.format(bridgesRepaired)}</strong> highway bridges.`,
+        `Replacing <strong>${nf1.format(waterMainMiles)}</strong> miles of aging water mains.`,
+        `Building <strong>${nf0.format(smallFactories)}</strong> advanced manufacturing plants.`,
+        `Purchasing <strong>${nf0.format(schoolLaptops)}</strong> classroom laptops.`,
+        `Putting <strong>${nf0.format(fireTrucks)}</strong> new fire engines into service.`,
+        `Constructing <strong>${nf0.format(publicSafetyStations)}</strong> fire and police stations.`,
+        `Funding registered apprenticeships for <strong>${nf0.format(apprenticeships)}</strong> workers.`,
+        `Buying <strong>${nf0.format(electricBuses)}</strong> electric school buses.`,
+        `Running fiber broadband across <strong>${nf1.format(fiberMiles)}</strong> miles of rural roads.`,
+        `Outfitting <strong>${nf0.format(firefighterGearSets)}</strong> firefighters with new gear.`,
+        `Covering a year of community college tuition for <strong>${nf0.format(communityCollegeYears)}</strong> students.`,
+        `Building <strong>${nf0.format(affordableUnits)}</strong> new affordable apartments.`,
+        `Installing <strong>${nf0.format(heatPumps)}</strong> high-efficiency heat pumps in homes.`,
+        `Replacing <strong>${nf0.format(leadPipes)}</strong> lead drinking water lines.`,
+        `Treating <strong>${nf0.format(wildfireAcres)}</strong> acres of forest to prevent megafires.`,
+        `Providing <strong>${nf0.format(mentalHealthSessions)}</strong> mental health counseling sessions.`,
+        `Delivering <strong>${nf0.format(mealsDelivered)}</strong> Meals on Wheels visits to homebound seniors.`,
+        `Supplying <strong>${nf0.format(foodBankMeals)}</strong> food bank meals nationwide.`,
+        `Covering insulin for <strong>${nf0.format(insulinMonths)}</strong> person-months of diabetes care.`,
+        `Endowing <strong>${nf0.format(stemScholarships)}</strong> four-year STEM scholarships.`,
+        `Hardening <strong>${nf0.format(resilientHomes)}</strong> coastal homes against hurricane winds.`,
+        `Providing <strong>${nf0.format(dvShelterNights)}</strong> nights of safe shelter for survivors of domestic violence.`,
+        `Covering prenatal care visits for <strong>${nf0.format(prenatalVisits)}</strong> expectant parents.`,
+        `Buying <strong>${nf0.format(vaccineDoses)}</strong> routine childhood vaccine doses.`,
+        `Building <strong>${nf0.format(cleanWaterSystems)}</strong> rural community water systems.`,
+      ];
+    }
 
-  let sentences = [];
-  let sentenceIndex = null;
-  let isTransitioning = false;
-  const ROTATE_MS = 10_000;
+    let sentences = [];
+    let sentenceIndex = null;
+    let isTransitioning = false;
+    const ROTATE_MS = 10_000;
 
-  // Animation loop: sample the spline at "now" to update totals and UI copy every frame.
-  function tick(){
-    if (tariffModel) {
-      const nowMs = Date.now();
-      total = tariffModel.cumulativeAt(nowMs);
-      const perDay = tariffModel.perDayRateAt(nowMs);
-      perSec = perDay / SECONDS_PER_DAY;
+    // Animation loop: sample the spline at "now" to update totals and UI copy every frame.
+    function tick(){
+      if (tariffModel) {
+        const nowMs = Date.now();
+        total = tariffModel.cumulativeAt(nowMs);
+        const perDay = tariffModel.perDayRateAt(nowMs);
+        perSec = perDay / SECONDS_PER_DAY;
 
-      els.total.textContent = fmt(total);
-      // Keep a tooltip handy so desktop users can see the live rate without extra UI.
-      els.total.title = `Current rate of ${fmt(perDay)} per day (${fmt(perSec)}/sec)`;
-      if (els.perHousehold) {
-        const householdShare = total / release.usHouseholds;
-        els.perHousehold.textContent = fmt(householdShare);
+        els.total.textContent = fmt(total);
+        // Keep a tooltip handy so desktop users can see the live rate without extra UI.
+        els.total.title = `Current rate of ${fmt(perDay)} per day (${fmt(perSec)}/sec)`;
+        if (els.perHousehold) {
+          const householdShare = total / release.usHouseholds;
+          els.perHousehold.textContent = fmt(householdShare);
+        }
+        if (els.perAdult) {
+          const adultShare = total / release.usAdultPopulation;
+          els.perAdult.textContent = fmt(adultShare);
+        }
+
+        sentences = buildSentences(total);
+
+        if (sentenceIndex === null && sentences.length) {
+          sentenceIndex = Math.floor(Math.random() * sentences.length);
+        }
+
+        if (!isTransitioning && sentences.length) {
+          els.scaleSentence.innerHTML = sentences[sentenceIndex];
+        }
       }
-      if (els.perAdult) {
-        const adultShare = total / release.usAdultPopulation;
-        els.perAdult.textContent = fmt(adultShare);
-      }
 
-      sentences = buildSentences(total);
+      requestAnimationFrame(tick);
+    }
 
-      if (sentenceIndex === null && sentences.length) {
+    // Rotate the narrative sentences periodically with a quick fade transition.
+    setInterval(() => {
+      if (!sentences.length) return;
+      if (sentenceIndex === null) {
         sentenceIndex = Math.floor(Math.random() * sentences.length);
       }
-
-      if (!isTransitioning && sentences.length) {
+      isTransitioning = true;
+      els.scaleSentence.classList.add('fading');
+      setTimeout(() => {
+        sentenceIndex = (sentenceIndex + Math.round(Math.random() * 10)) % sentences.length;
         els.scaleSentence.innerHTML = sentences[sentenceIndex];
+        els.scaleSentence.classList.remove('fading');
+        isTransitioning = false;
+      }, 250);
+    }, ROTATE_MS);
+
+    // Convert an ISO YYYY-MM-DD string into a UTC timestamp (ms) without local TZ skew.
+    function parseDateUTC(dateStr){
+      const [year, month, day] = dateStr.split('-').map(Number);
+      return Date.UTC(year, (month ?? 1) - 1, day ?? 1);
+    }
+
+    // Collapse duplicate records per month and keep only {record_date, amount} pairs sorted oldest→newest.
+    function normalizeTariffData(entries){
+      const aggregated = new Map();
+      for (const entry of entries){
+        const recordDate = entry.record_date;
+        if (!recordDate) continue;
+        const amountRaw = entry.current_month_net_rcpt_amt ?? entry.amount;
+        const amount = Number(amountRaw);
+        if (!Number.isFinite(amount)) continue;
+        aggregated.set(recordDate, (aggregated.get(recordDate) ?? 0) + amount);
       }
+      return Array.from(aggregated.entries())
+              .map(([record_date, amount]) => ({record_date, amount}))
+              .sort((a, b) => a.record_date.localeCompare(b.record_date));
     }
 
-    requestAnimationFrame(tick);
-  }
+    // Build a monotone cubic spline over cumulative monthly totals so daily accruals stay smooth and non-negative.
+    function buildTariffModel(entries){
+      if (!Array.isArray(entries) || !entries.length) return null;
 
-  // Rotate the narrative sentences periodically with a quick fade transition.
-  setInterval(() => {
-    if (!sentences.length) return;
-    if (sentenceIndex === null) {
-      sentenceIndex = Math.floor(Math.random() * sentences.length);
-    }
-    isTransitioning = true;
-    els.scaleSentence.classList.add('fading');
-    setTimeout(() => {
-      sentenceIndex = (sentenceIndex + Math.round(Math.random() * 10)) % sentences.length;
-      els.scaleSentence.innerHTML = sentences[sentenceIndex];
-      els.scaleSentence.classList.remove('fading');
-      isTransitioning = false;
-    }, 250);
-  }, ROTATE_MS);
+      const monthly = entries
+              .map(entry => {
+                const endOfMonthMs = parseDateUTC(entry.record_date);
+                const endDate = new Date(endOfMonthMs);
+                const startMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), 1);
+                const nextMonthStartMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 1);
+                return {
+                  recordDate: entry.record_date,
+                  startMs,
+                  endMs: nextMonthStartMs,
+                  total: entry.amount,
+                };
+              })
+              .filter(month => month.endMs > RELEASE_START_MS)
+              .sort((a, b) => a.startMs - b.startMs);
 
-  // Convert an ISO YYYY-MM-DD string into a UTC timestamp (ms) without local TZ skew.
-  function parseDateUTC(dateStr){
-    const [year, month, day] = dateStr.split('-').map(Number);
-    return Date.UTC(year, (month ?? 1) - 1, day ?? 1);
-  }
+      if (!monthly.length) return null;
 
-  // Collapse duplicate records per month and keep only {record_date, amount} pairs sorted oldest→newest.
-  function normalizeTariffData(entries){
-    const aggregated = new Map();
-    for (const entry of entries){
-      const recordDate = entry.record_date;
-      if (!recordDate) continue;
-      const amountRaw = entry.current_month_net_rcpt_amt ?? entry.amount;
-      const amount = Number(amountRaw);
-      if (!Number.isFinite(amount)) continue;
-      aggregated.set(recordDate, (aggregated.get(recordDate) ?? 0) + amount);
-    }
-    return Array.from(aggregated.entries())
-      .map(([record_date, amount]) => ({record_date, amount}))
-      .sort((a, b) => a.record_date.localeCompare(b.record_date));
-  }
+      let cumulativeTotal = 0;
+      const xs = [RELEASE_START_MS];
+      const ys = [0];
 
-  // Build a monotone cubic spline over cumulative monthly totals so daily accruals stay smooth and non-negative.
-  function buildTariffModel(entries){
-    if (!Array.isArray(entries) || !entries.length) return null;
-
-    const monthly = entries
-      .map(entry => {
-        const endOfMonthMs = parseDateUTC(entry.record_date);
-        const endDate = new Date(endOfMonthMs);
-        const startMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), 1);
-        const nextMonthStartMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 1);
-        return {
-          recordDate: entry.record_date,
-          startMs,
-          endMs: nextMonthStartMs,
-          total: entry.amount,
-        };
-      })
-      .filter(month => month.endMs > RELEASE_START_MS)
-      .sort((a, b) => a.startMs - b.startMs);
-
-    if (!monthly.length) return null;
-
-    let cumulativeTotal = 0;
-    const xs = [RELEASE_START_MS];
-    const ys = [0];
-
-    for (const month of monthly){
-      cumulativeTotal += month.total;
-      xs.push(month.endMs);
-      ys.push(cumulativeTotal);
-    }
-
-    const n = xs.length - 1;
-    const h = new Array(n);
-    const delta = new Array(n);
-
-    for (let i = 0; i < n; i++){
-      h[i] = xs[i + 1] - xs[i];
-      delta[i] = (ys[i + 1] - ys[i]) / h[i];
-    }
-
-    const m = new Array(n + 1);
-    m[0] = delta[0];
-    m[n] = delta[n - 1];
-
-    for (let i = 1; i < n; i++){
-      if (delta[i - 1] === 0 || delta[i] === 0){
-        m[i] = 0;
-      } else {
-        const w1 = 2 * h[i] + h[i - 1];
-        const w2 = h[i] + 2 * h[i - 1];
-        m[i] = (w1 + w2) / ((w1 / delta[i - 1]) + (w2 / delta[i]));
-      }
-    }
-
-    for (let i = 0; i < n; i++){
-      if (delta[i] === 0){
-        m[i] = 0;
-        m[i + 1] = 0;
-      } else {
-        const a = m[i] / delta[i];
-        const b = m[i + 1] / delta[i];
-        const sum = a * a + b * b;
-        if (sum > 9){
-          const tau = 3 / Math.sqrt(sum);
-          m[i] = tau * a * delta[i];
-          m[i + 1] = tau * b * delta[i];
-        }
-      }
-    }
-
-    const segments = [];
-    for (let i = 0; i < n; i++){
-      segments.push({
-        startMs: xs[i],
-        endMs: xs[i + 1],
-        h: h[i],
-        y0: ys[i],
-        y1: ys[i + 1],
-        m0: m[i],
-        m1: m[i + 1],
-      });
-    }
-
-    const lastMonth = monthly[monthly.length - 1];
-
-    // Evaluate the integrated spline at any point in time to recover cumulative duties paid.
-    function cumulativeAt(ms){
-      if (ms <= xs[0]) return 0;
-      if (ms >= xs[n]){
-        return ys[n] + (ms - xs[n]) * m[n];
+      for (const month of monthly){
+        cumulativeTotal += month.total;
+        xs.push(month.endMs);
+        ys.push(cumulativeTotal);
       }
 
-      for (const seg of segments){
-        if (ms < seg.endMs){
-          const t = (ms - seg.startMs) / seg.h;
-          const t2 = t * t;
-          const t3 = t2 * t;
-          return (
-            (2 * t3 - 3 * t2 + 1) * seg.y0 +
-            (t3 - 2 * t2 + t) * seg.h * seg.m0 +
-            (-2 * t3 + 3 * t2) * seg.y1 +
-            (t3 - t2) * seg.h * seg.m1
-          );
+      const n = xs.length - 1;
+      const h = new Array(n);
+      const delta = new Array(n);
+
+      for (let i = 0; i < n; i++){
+        h[i] = xs[i + 1] - xs[i];
+        delta[i] = (ys[i + 1] - ys[i]) / h[i];
+      }
+
+      const m = new Array(n + 1);
+      m[0] = delta[0];
+      m[n] = delta[n - 1];
+
+      for (let i = 1; i < n; i++){
+        if (delta[i - 1] === 0 || delta[i] === 0){
+          m[i] = 0;
+        } else {
+          const w1 = 2 * h[i] + h[i - 1];
+          const w2 = h[i] + 2 * h[i - 1];
+          m[i] = (w1 + w2) / ((w1 / delta[i - 1]) + (w2 / delta[i]));
         }
       }
 
-      return ys[n];
-    }
-
-    // Derive the instantaneous daily rate at time "ms" by differentiating the spline segment.
-    function perDayRateAt(ms){
-      let slopePerMs;
-
-      if (ms <= xs[0]){
-        slopePerMs = m[0];
-      } else if (ms >= xs[n]){
-        slopePerMs = m[n];
-      } else {
-        for (const seg of segments){
-          if (ms < seg.endMs){
-            const t = (ms - seg.startMs) / seg.h;
-            const t2 = t * t;
-            const slopeNumerator =
-              (6 * t2 - 6 * t) * seg.y0 +
-              (3 * t2 - 4 * t + 1) * seg.h * seg.m0 +
-              (-6 * t2 + 6 * t) * seg.y1 +
-              (3 * t2 - 2 * t) * seg.h * seg.m1;
-            slopePerMs = slopeNumerator / seg.h;
-            break;
+      for (let i = 0; i < n; i++){
+        if (delta[i] === 0){
+          m[i] = 0;
+          m[i + 1] = 0;
+        } else {
+          const a = m[i] / delta[i];
+          const b = m[i + 1] / delta[i];
+          const sum = a * a + b * b;
+          if (sum > 9){
+            const tau = 3 / Math.sqrt(sum);
+            m[i] = tau * a * delta[i];
+            m[i + 1] = tau * b * delta[i];
           }
         }
       }
 
-      if (slopePerMs === undefined) slopePerMs = 0;
-      return Math.max(0, slopePerMs * MS_PER_DAY);
+      const segments = [];
+      for (let i = 0; i < n; i++){
+        segments.push({
+          startMs: xs[i],
+          endMs: xs[i + 1],
+          h: h[i],
+          y0: ys[i],
+          y1: ys[i + 1],
+          m0: m[i],
+          m1: m[i + 1],
+        });
+      }
+
+      const lastMonth = monthly[monthly.length - 1];
+
+      // Evaluate the integrated spline at any point in time to recover cumulative duties paid.
+      function cumulativeAt(ms){
+        if (ms <= xs[0]) return 0;
+        if (ms >= xs[n]){
+          return ys[n] + (ms - xs[n]) * m[n];
+        }
+
+        for (const seg of segments){
+          if (ms < seg.endMs){
+            const t = (ms - seg.startMs) / seg.h;
+            const t2 = t * t;
+            const t3 = t2 * t;
+            return (
+                    (2 * t3 - 3 * t2 + 1) * seg.y0 +
+                    (t3 - 2 * t2 + t) * seg.h * seg.m0 +
+                    (-2 * t3 + 3 * t2) * seg.y1 +
+                    (t3 - t2) * seg.h * seg.m1
+            );
+          }
+        }
+
+        return ys[n];
+      }
+
+      // Derive the instantaneous daily rate at time "ms" by differentiating the spline segment.
+      function perDayRateAt(ms){
+        let slopePerMs;
+
+        if (ms <= xs[0]){
+          slopePerMs = m[0];
+        } else if (ms >= xs[n]){
+          slopePerMs = m[n];
+        } else {
+          for (const seg of segments){
+            if (ms < seg.endMs){
+              const t = (ms - seg.startMs) / seg.h;
+              const t2 = t * t;
+              const slopeNumerator =
+                      (6 * t2 - 6 * t) * seg.y0 +
+                      (3 * t2 - 4 * t + 1) * seg.h * seg.m0 +
+                      (-6 * t2 + 6 * t) * seg.y1 +
+                      (3 * t2 - 2 * t) * seg.h * seg.m1;
+              slopePerMs = slopeNumerator / seg.h;
+              break;
+            }
+          }
+        }
+
+        if (slopePerMs === undefined) slopePerMs = 0;
+        return Math.max(0, slopePerMs * MS_PER_DAY);
+      }
+
+      return {
+        cumulativeAt,
+        perDayRateAt,
+        latestMonthStartMs: lastMonth.startMs,
+      };
     }
 
-    return {
-      cumulativeAt,
-      perDayRateAt,
-      latestMonthStartMs: lastMonth.startMs,
-    };
-  }
+    // Fetch the latest Treasury duties series (with local cache fallback) and return a ready-to-use spline model.
+    async function fetchTariffModel(){
+      const cachedRaw = localStorage.getItem(STORAGE_KEY);
+      let cachedEntries = null;
 
-  // Fetch the latest Treasury duties series (with local cache fallback) and return a ready-to-use spline model.
-  async function fetchTariffModel(){
-    const cachedRaw = localStorage.getItem(STORAGE_KEY);
-    let cachedEntries = null;
+      if (cachedRaw){
+        try {
+          cachedEntries = JSON.parse(cachedRaw);
+        } catch (err){
+          console.warn('Failed to parse cached tariff series', err);
+        }
+      }
 
-    if (cachedRaw){
+      if (cachedEntries && cachedEntries.length){
+        return buildTariffModel(cachedEntries);
+      }
+
       try {
-        cachedEntries = JSON.parse(cachedRaw);
+        const TDATA_ENDPOINT = 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_4?sort=-record_date&format=json&filter=classification_desc:eq:Customs%20Duties,record_date:gt:2025-03-31';
+        const response = await fetch(TDATA_ENDPOINT);
+        if (!response.ok) throw new Error(`Treasury API error ${response.status}`);
+        const json = await response.json();
+        const normalized = normalizeTariffData(
+                (json.data ?? []).filter(entry => entry.classification_desc === 'Customs Duties')
+        );
+        if (normalized.length){
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+          return buildTariffModel(normalized);
+        }
       } catch (err){
-        console.warn('Failed to parse cached tariff series', err);
+        console.warn('Tariff data fetch failed, using fallback', err);
       }
+
+      return null;
     }
 
-    if (cachedEntries && cachedEntries.length){
-      return buildTariffModel(cachedEntries);
-    }
+    // Entry point: load data model and kick off the animation loop.
+    async function init(){
+      tariffModel = await fetchTariffModel();
 
-    try {
-      const TDATA_ENDPOINT = 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_4?sort=-record_date&format=json&filter=classification_desc:eq:Customs%20Duties,record_date:gt:2025-03-31';
-      const response = await fetch(TDATA_ENDPOINT);
-      if (!response.ok) throw new Error(`Treasury API error ${response.status}`);
-      const json = await response.json();
-      const normalized = normalizeTariffData(
-        (json.data ?? []).filter(entry => entry.classification_desc === 'Customs Duties')
-      );
-      if (normalized.length){
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-        return buildTariffModel(normalized);
+      if (!tariffModel){
+        if (els.loadingText) {
+          els.loadingText.textContent = 'Unable to load Treasury data right now.';
+        }
+        return;
       }
-    } catch (err){
-      console.warn('Tariff data fetch failed, using fallback', err);
+
+      els.loading.classList.add('hidden');
+
+      tick();
     }
 
-    return null;
-  }
+    init();
 
-  // Entry point: load data model and kick off the animation loop.
-  async function init(){
-    tariffModel = await fetchTariffModel();
-
-    if (!tariffModel){
-      if (els.loadingText) {
-        els.loadingText.textContent = 'Unable to load Treasury data right now.';
-      }
-      return;
-    }
-
-    els.loading.classList.add('hidden');
-
-    tick();
-  }
-
-  init();
-
-})();
+  })();
 </script>
 </body>
 </html>

@@ -106,8 +106,7 @@
   </div>
 
   <div class="foot">
-    <div class="sources" id="releaseLabel"></div>
-    <p>Notes: This is a simplified, gross measure of tariff collections. Not every dollar of duties = consumer price increases; some costs are absorbed by firms. Duties are an import tax ultimately borne by U.S. businesses and households over time. Data refresh is monthly; the live clock is an extrapolation. Tariff totals pull directly from the U.S. Treasury FiscalData API (Monthly Treasury Statement Table 4) whenever new records are published.</p>
+    <p>Notes: The clock totals U.S. customs duties remitted since April 2025, as reported in the Monthly Treasury Statement (Table 4). It's a revenue measure of tariff taxes, not a direct estimate of price changes or broader economic losses. Importers and exporters may absorb part of the burden while the rest passes through to businesses and households over time. Figures refresh monthly when Treasury publishes new data; the live counter extrapolates between releases using the latest pace.</p>
     <p class="sources">Sources: U.S. Treasury FiscalData API — Monthly Treasury Statement Table 4 • BLS Import/Export Price Program • BLS CPI detailed tables • BLS OEWS</p>
   </div>
 
@@ -116,6 +115,7 @@
 <script>
 (() => {
   // ---------- Static configuration & live Treasury data fetch ----------
+  // Reference values for translating tariff totals into household-meaningful comparisons.
   const release = {
     startISO: '2025-04-01T00:00:00Z',
     iphone17Price: 799, // Retail for iPhone 17
@@ -129,15 +129,11 @@
     usGraduatesPerYear: 3_700_000, // U.S. high school graduates annually (NCES)
     usBirthsPerYear: 3_700_000, // Annual U.S. births (CDC 2023)
     dailyERVisits: 400_000, // Approximate national ER visits per day (HCUP 2022)
-    solarCityHouseholds: 90_000, // Households in Reno, NV (ACS rounded)
-    tampaHouseholds: 165_000, // Households in Tampa, FL metro core (ACS rounded)
     largeUniversityEnrollment: 30_000, // Enrollment at a large state university campus
     usHouseholds: 128_000_000, // Total U.S. households (ACS 2023)
     usAdultPopulation: 258_000_000, // Adults 18+ (Census 2023)
     avgElectricBillMonthly: 137, // Average monthly residential electric bill (EIA 2023)
     familyFoodAnnual: 11_000, // Average annual food-at-home spend for a family of four (USDA 2024)
-    usRenterHouseholds: 44_000_000, // Renter-occupied households (Census CPS 2023)
-    avgRentMonthly: 1_450, // Median asking rent (Census 2024 Q1)
     publicTuitionAnnual: 11_260, // Average in-state public 4-yr tuition & fees (College Board 2023)
     interstateMileCost: 20_000_000, // Typical cost to rebuild a mile of interstate (FHWA range)
     femaHouseholdGrant: 35_500, // Average Individual Assistance grant after major disasters (FEMA 2023)
@@ -166,40 +162,44 @@
     firefighterGearSetCost: 18_000 // Complete turnout gear and equipment per firefighter (NFPA 2024)
   };
 
+  // Human-friendly number formatters used throughout the UI.
   const nf0 = new Intl.NumberFormat('en-US',{minimumFractionDigits:0, maximumFractionDigits:0});
   const nf1 = new Intl.NumberFormat('en-US',{minimumFractionDigits:1, maximumFractionDigits:1});
-  const nfcmp = new Intl.NumberFormat('en-US',{notation:'compact', maximumFractionDigits:1});
   const nfc = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0});
   const fmt = v => nfc.format(v);
 
+  // Cache key DOM nodes once to avoid repeated lookups in the animation loop.
   const els = {
     total: document.getElementById('total'),
     loading: document.getElementById('loading'),
-    startLabel: document.getElementById('startLabel'),
+    loadingText: document.getElementById('loadingText'),
     scaleSentence: document.getElementById('scaleSentence'),
-    releaseLabel: document.getElementById('releaseLabel'),
     perHousehold: document.getElementById('perHousehold'),
     perAdult: document.getElementById('perAdult'),
   };
 
+  // Core timing metadata and cache key for the fetched Treasury series.
+  const RELEASE_START_MS = Date.parse(release.startISO);
+  const MS_PER_DAY = 86_400_000;
+  const SECONDS_PER_DAY = 86_400;
+  const STORAGE_KEY_VERSION = 'v1';
+  const STORAGE_KEY = `tariffSeries-${STORAGE_KEY_VERSION}-${release.startISO}`;
+
+  // Mutable runtime state populated after the data model is constructed.
   let perSec = 0;
   let total = 0;
-  let last = performance.now();
-  let startMs = Date.parse(release.startISO);
+  let tariffModel = null;
 
+  // Translate the ever-growing total into concrete comparisons for the narrative rotator.
   function buildSentences(total){
     const iphoneClasses = total / (release.iphone17Price * release.usGraduatesPerYear);
     const electricMonths = total / (release.avgElectricBillMonthly * release.usHouseholds);
-    const rentMonths = total / (release.avgRentMonthly * release.usRenterHouseholds);
     const teachers = total / release.teacherPay;
     const studentDebtBorrowers = total / release.studentDebtBalance;
-    const studentClasses = studentDebtBorrowers / release.usGraduatesPerYear;
     const childcareMonths = total / ((release.childcareCost / 12) * release.usBirthsPerYear);
     const erDays = total / (release.erVisitCost * release.dailyERVisits);
     const solarHomes = total / release.solarInstallCost;
-    const solarCities = solarHomes / release.solarCityHouseholds;
     const premiums = total / release.familyPremium;
-    const premiumCities = premiums / release.tampaHouseholds;
     const groceryFamilies = total / release.familyFoodAnnual;
     const pellAwards = total / release.pellGrantMax;
     const pellUniversities = pellAwards / release.largeUniversityEnrollment;
@@ -227,6 +227,7 @@
     const fiberMiles = total / release.fiberMileCost;
     const firefighterGearSets = total / release.firefighterGearSetCost;
 
+    // String fragments are pre-built here so the rotator can swap them in cheaply.
     return [
       `Paying the electric bill of every U.S. household for the next <strong>${nf1.format(electricMonths)}</strong> months.`,
       `Zeroing out student loans for <strong>${nf0.format(studentDebtBorrowers)}</strong> borrowers.`,
@@ -264,14 +265,17 @@
   let isTransitioning = false;
   const ROTATE_MS = 10_000;
 
-  function tick(now){
-    const dt = (now - last)/1000;
-    last = now;
-
-    if (perSec !== null) {
-      total += perSec * dt;
+  // Animation loop: sample the spline at "now" to update totals and UI copy every frame.
+  function tick(){
+    if (tariffModel) {
+      const nowMs = Date.now();
+      total = tariffModel.cumulativeAt(nowMs);
+      const perDay = tariffModel.perDayRateAt(nowMs);
+      perSec = perDay / SECONDS_PER_DAY;
 
       els.total.textContent = fmt(total);
+      // Keep a tooltip handy so desktop users can see the live rate without extra UI.
+      els.total.title = `Current rate of ${fmt(perDay)} per day (${fmt(perSec)}/sec)`;
       if (els.perHousehold) {
         const householdShare = total / release.usHouseholds;
         els.perHousehold.textContent = fmt(householdShare);
@@ -290,12 +294,12 @@
       if (!isTransitioning && sentences.length) {
         els.scaleSentence.innerHTML = sentences[sentenceIndex];
       }
-
     }
 
     requestAnimationFrame(tick);
   }
 
+  // Rotate the narrative sentences periodically with a quick fade transition.
   setInterval(() => {
     if (!sentences.length) return;
     if (sentenceIndex === null) {
@@ -311,39 +315,223 @@
     }, 250);
   }, ROTATE_MS);
 
-  async function fetchLatestTariffs(){
-    let perSecond = localStorage.getItem(`tariffPerSec-${release.startISO}`);
-    if (perSecond)
-      return Number(perSecond);
+  // Convert an ISO YYYY-MM-DD string into a UTC timestamp (ms) without local TZ skew.
+  function parseDateUTC(dateStr){
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return Date.UTC(year, (month ?? 1) - 1, day ?? 1);
+  }
+
+  // Collapse duplicate records per month and keep only {record_date, amount} pairs sorted oldest→newest.
+  function normalizeTariffData(entries){
+    const aggregated = new Map();
+    for (const entry of entries){
+      const recordDate = entry.record_date;
+      if (!recordDate) continue;
+      const amountRaw = entry.current_month_net_rcpt_amt ?? entry.amount;
+      const amount = Number(amountRaw);
+      if (!Number.isFinite(amount)) continue;
+      aggregated.set(recordDate, (aggregated.get(recordDate) ?? 0) + amount);
+    }
+    return Array.from(aggregated.entries())
+      .map(([record_date, amount]) => ({record_date, amount}))
+      .sort((a, b) => a.record_date.localeCompare(b.record_date));
+  }
+
+  // Build a monotone cubic spline over cumulative monthly totals so daily accruals stay smooth and non-negative.
+  function buildTariffModel(entries){
+    if (!Array.isArray(entries) || !entries.length) return null;
+
+    const monthly = entries
+      .map(entry => {
+        const endOfMonthMs = parseDateUTC(entry.record_date);
+        const endDate = new Date(endOfMonthMs);
+        const startMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), 1);
+        const nextMonthStartMs = Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth() + 1, 1);
+        return {
+          recordDate: entry.record_date,
+          startMs,
+          endMs: nextMonthStartMs,
+          total: entry.amount,
+        };
+      })
+      .filter(month => month.endMs > RELEASE_START_MS)
+      .sort((a, b) => a.startMs - b.startMs);
+
+    if (!monthly.length) return null;
+
+    let cumulativeTotal = 0;
+    const xs = [RELEASE_START_MS];
+    const ys = [0];
+
+    for (const month of monthly){
+      cumulativeTotal += month.total;
+      xs.push(month.endMs);
+      ys.push(cumulativeTotal);
+    }
+
+    const n = xs.length - 1;
+    const h = new Array(n);
+    const delta = new Array(n);
+
+    for (let i = 0; i < n; i++){
+      h[i] = xs[i + 1] - xs[i];
+      delta[i] = (ys[i + 1] - ys[i]) / h[i];
+    }
+
+    const m = new Array(n + 1);
+    m[0] = delta[0];
+    m[n] = delta[n - 1];
+
+    for (let i = 1; i < n; i++){
+      if (delta[i - 1] === 0 || delta[i] === 0){
+        m[i] = 0;
+      } else {
+        const w1 = 2 * h[i] + h[i - 1];
+        const w2 = h[i] + 2 * h[i - 1];
+        m[i] = (w1 + w2) / ((w1 / delta[i - 1]) + (w2 / delta[i]));
+      }
+    }
+
+    for (let i = 0; i < n; i++){
+      if (delta[i] === 0){
+        m[i] = 0;
+        m[i + 1] = 0;
+      } else {
+        const a = m[i] / delta[i];
+        const b = m[i + 1] / delta[i];
+        const sum = a * a + b * b;
+        if (sum > 9){
+          const tau = 3 / Math.sqrt(sum);
+          m[i] = tau * a * delta[i];
+          m[i + 1] = tau * b * delta[i];
+        }
+      }
+    }
+
+    const segments = [];
+    for (let i = 0; i < n; i++){
+      segments.push({
+        startMs: xs[i],
+        endMs: xs[i + 1],
+        h: h[i],
+        y0: ys[i],
+        y1: ys[i + 1],
+        m0: m[i],
+        m1: m[i + 1],
+      });
+    }
+
+    const lastMonth = monthly[monthly.length - 1];
+
+    // Evaluate the integrated spline at any point in time to recover cumulative duties paid.
+    function cumulativeAt(ms){
+      if (ms <= xs[0]) return 0;
+      if (ms >= xs[n]){
+        return ys[n] + (ms - xs[n]) * m[n];
+      }
+
+      for (const seg of segments){
+        if (ms < seg.endMs){
+          const t = (ms - seg.startMs) / seg.h;
+          const t2 = t * t;
+          const t3 = t2 * t;
+          return (
+            (2 * t3 - 3 * t2 + 1) * seg.y0 +
+            (t3 - 2 * t2 + t) * seg.h * seg.m0 +
+            (-2 * t3 + 3 * t2) * seg.y1 +
+            (t3 - t2) * seg.h * seg.m1
+          );
+        }
+      }
+
+      return ys[n];
+    }
+
+    // Derive the instantaneous daily rate at time "ms" by differentiating the spline segment.
+    function perDayRateAt(ms){
+      let slopePerMs;
+
+      if (ms <= xs[0]){
+        slopePerMs = m[0];
+      } else if (ms >= xs[n]){
+        slopePerMs = m[n];
+      } else {
+        for (const seg of segments){
+          if (ms < seg.endMs){
+            const t = (ms - seg.startMs) / seg.h;
+            const t2 = t * t;
+            const slopeNumerator =
+              (6 * t2 - 6 * t) * seg.y0 +
+              (3 * t2 - 4 * t + 1) * seg.h * seg.m0 +
+              (-6 * t2 + 6 * t) * seg.y1 +
+              (3 * t2 - 2 * t) * seg.h * seg.m1;
+            slopePerMs = slopeNumerator / seg.h;
+            break;
+          }
+        }
+      }
+
+      if (slopePerMs === undefined) slopePerMs = 0;
+      return Math.max(0, slopePerMs * MS_PER_DAY);
+    }
+
+    return {
+      cumulativeAt,
+      perDayRateAt,
+      latestMonthStartMs: lastMonth.startMs,
+    };
+  }
+
+  // Fetch the latest Treasury duties series (with local cache fallback) and return a ready-to-use spline model.
+  async function fetchTariffModel(){
+    const cachedRaw = localStorage.getItem(STORAGE_KEY);
+    let cachedEntries = null;
+
+    if (cachedRaw){
+      try {
+        cachedEntries = JSON.parse(cachedRaw);
+      } catch (err){
+        console.warn('Failed to parse cached tariff series', err);
+      }
+    }
+
+    if (cachedEntries && cachedEntries.length){
+      return buildTariffModel(cachedEntries);
+    }
 
     try {
       const TDATA_ENDPOINT = 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/mts/mts_table_4?sort=-record_date&format=json&filter=classification_desc:eq:Customs%20Duties,record_date:gt:2025-03-31';
       const response = await fetch(TDATA_ENDPOINT);
       if (!response.ok) throw new Error(`Treasury API error ${response.status}`);
       const json = await response.json();
-      const entries = json.data.filter(entry => entry.classification_desc === 'Customs Duties');
-
-      const totalDutiesUSD = entries.reduce((tot, cur) => {
-        return tot + Number(cur.current_month_net_rcpt_amt)
-      }, 0)
-      const totalDays = entries.reduce((tot, cur) => {
-        return tot + Number(cur.record_calendar_day)
-      }, 0);
-      perSecond = totalDutiesUSD / (totalDays * 86400);
-      localStorage.setItem(`tariffPerSec-${release.startISO}`, perSecond);
-      return perSecond;
-    } catch (err) {
+      const normalized = normalizeTariffData(
+        (json.data ?? []).filter(entry => entry.classification_desc === 'Customs Duties')
+      );
+      if (normalized.length){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+        return buildTariffModel(normalized);
+      }
+    } catch (err){
       console.warn('Tariff data fetch failed, using fallback', err);
     }
+
+    return null;
   }
 
+  // Entry point: load data model and kick off the animation loop.
   async function init(){
-    perSec = await fetchLatestTariffs();
-    els.loading.classList.add('hidden')
-    startMs = Date.parse(release.startISO);
-    total = ((Date.now() - startMs) / 1000) * perSec;
-    last = performance.now();
-    requestAnimationFrame(tick);
+    tariffModel = await fetchTariffModel();
+
+    if (!tariffModel){
+      if (els.loadingText) {
+        els.loadingText.textContent = 'Unable to load Treasury data right now.';
+      }
+      return;
+    }
+
+    els.loading.classList.add('hidden');
+
+    tick();
   }
 
   init();
